@@ -1,4 +1,4 @@
-/// Copyright (c) 2018 Razeware LLC
+/// Copyright (c) 2019 Razeware LLC
 /// 
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
@@ -26,21 +26,39 @@
 /// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 /// THE SOFTWARE.
 
+import Foundation
 import SpriteKit
 
-class GameScene: SKScene {
-  
-  // MARK: - Private properties
-  
-  // Player sprite (i.e the ninja)
-  private let player = SKSpriteNode(imageNamed: "player")
-  
-  override func didMove(to view: SKView) {
-    backgroundColor = SKColor.white
-    // Setting the position of the sprite to be 10% across horizontally, and centered veritcally.
-    player.position = CGPoint(x: size.width * 0.1, y: size.height * 0.5)
-    // To make the sprite appear on the scene, we must add it as a child of the scene.
-    addChild(player)
+// Standard implementations of some vector math functions
+
+func +(left: CGPoint, right: CGPoint) -> CGPoint {
+  return CGPoint(x: left.x + right.x, y: left.y + right.y)
+}
+
+func -(left: CGPoint, right: CGPoint) -> CGPoint {
+  return CGPoint(x: left.x - right.x, y: left.y - right.y)
+}
+
+func *(point: CGPoint, scalar: CGFloat) -> CGPoint {
+  return CGPoint(x: point.x * scalar, y: point.y * scalar)
+}
+
+func /(point: CGPoint, scalar: CGFloat) -> CGPoint {
+  return CGPoint(x: point.x / scalar, y: point.y / scalar)
+}
+
+#if !(arch(x86_64) || arch(arm64))
+  func sqrt(a: CGFloat) -> CGFloat {
+    return CGFloat(sqrtf(Float(a)))
+  }
+#endif
+
+extension CGPoint {
+  func length() -> CGFloat {
+    return sqrt(x*x + y*y)
   }
   
+  func normalizewd() -> CGPoint {
+    return self / length()
+  }
 }
