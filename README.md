@@ -1,5 +1,7 @@
 # SpriteKit Experiments
 
+* Based of Ray Wenderlich tutorials.
+
 SpriteKit is one of the best ways to make games on iOS. It’s easy to learn, powerful, and is fully supported by Apple.
 
 ## Advantages to SpriteKit:
