@@ -1,30 +1,6 @@
-/// Copyright (c) 2018 Razeware LLC
-/// 
-/// Permission is hereby granted, free of charge, to any person obtaining a copy
-/// of this software and associated documentation files (the "Software"), to deal
-/// in the Software without restriction, including without limitation the rights
-/// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-/// copies of the Software, and to permit persons to whom the Software is
-/// furnished to do so, subject to the following conditions:
-/// 
-/// The above copyright notice and this permission notice shall be included in
-/// all copies or substantial portions of the Software.
-/// 
-/// Notwithstanding the foregoing, you may not use, copy, modify, merge, publish,
-/// distribute, sublicense, create a derivative work, and/or sell copies of the
-/// Software in any work that is designed, intended, or marketed for pedagogical or
-/// instructional purposes related to programming, coding, application development,
-/// or information technology.  Permission for such use, copying, modification,
-/// merger, publication, distribution, sublicensing, creation of derivative works,
-/// or sale is expressly withheld.
-/// 
-/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-/// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-/// THE SOFTWARE.
+//  Created by Carlos Arenas on 05/14/19.
+//  Copyright © 2018 Polygon. All rights reserved.
+//
 
 import SpriteKit
 
@@ -43,6 +19,9 @@ class GameScene: SKScene {
     player.position = CGPoint(x: size.width * 0.1, y: size.height * 0.5)
     // To make the sprite appear on the scene, we must add it as a child of the scene.
     addChild(player)
+    
+    physicsWorld.gravity = .zero
+    physicsWorld.contactDelegate = self
     
     // Create the monster and make them contiounsly spawning over time
     run(SKAction.repeatForever(
@@ -66,8 +45,18 @@ class GameScene: SKScene {
     let projectile = SKSpriteNode(imageNamed: "projectile")
     projectile.position = player.position
     
-    // Determine offset of location to projectile. Subtract the projectile's current position
-    // from the touch location to get a vector from the current position to the touch location.
+    // -- Collision detection and physics
+    // Using a circle shaped body instead of a rectangle body. Since the projectile is a nice circle, this makes for a better match.
+    projectile.physicsBody = SKPhysicsBody(circleOfRadius: projectile.size.width/2)
+    projectile.physicsBody?.isDynamic = true
+    projectile.physicsBody?.categoryBitMask = PhysicsCategory.projectile
+    projectile.physicsBody?.contactTestBitMask = PhysicsCategory.monster
+    projectile.physicsBody?.collisionBitMask = PhysicsCategory.none
+    // You also set usesPreciseCollisionDetection to true. This is important to set for fast moving bodies like projectiles, because otherwise there is a chance that two fast moving bodies can pass through each other without a collision being detected.
+    projectile.physicsBody?.usesPreciseCollisionDetection = true
+    // --
+    
+    // Determine offset of location to projectile. Subtract the projectile's current position from the touch location to get a vector from the current position to the touch location.
     let offset = touchLocation - projectile.position
     
     // Bail out if you are shooting down or backwards
@@ -76,13 +65,10 @@ class GameScene: SKScene {
     // The position has been double checked, we should add the projectile now
     addChild(projectile)
     
-    // Get the direction of where to shoot. Convert the offset into a unit vector (of length 1) by
-    // calling normalized(). This will make it easy to make a vector with a fixed length in the
-    // same direction, because 1 * length = length.
+    // Get the direction of where to shoot. Convert the offset into a unit vector (of length 1) by calling normalized(). This will make it easy to make a vector with a fixed length in the same direction, because 1 * length = length.
     let direction = offset.normalized()
     
-    // Make it shoot far enough to be guaranteed off screen. Add the shoot amount to the current
-    // position to get where it should end up on the screen.
+    // Make it shoot far enough to be guaranteed off screen. Add the shoot amount to the current position to get where it should end up on the screen.
     let shootAmount = direction * 1000
     
     // Add the shoot amount to the current position
@@ -104,6 +90,19 @@ extension GameScene {
     
     // Create the sprite
     let monster = SKSpriteNode(imageNamed: "monster")
+    
+    // -- Collision detection and physics
+    // Create a physics body for the sprite. In this case, the body is defined as a rectangle of the same size as the sprite, since that's a decent approximation for the monster.
+    monster.physicsBody = SKPhysicsBody(rectangleOf: monster.size)
+    // Set the sprite to be dynamic. This means that the physics enfine will control the movement of the monster. It will be controlled through the move actions (already written)
+    monster.physicsBody?.isDynamic = true
+    // Set the category bit mask to be the mosnterCategory defined ealier.
+    monster.physicsBody?.categoryBitMask = PhysicsCategory.monster
+    // contactTestBitMask indicates what categories of objects this object should notify the contact listener when they intersect. Since it's a monster we choose projectiles here.
+    monster.physicsBody?.contactTestBitMask = PhysicsCategory.projectile
+    // collisionBitMask indicates what categories of objects that the physics engine will handle as contact responses (i.e. bounce off of). You don't want the monster and projectile to bounce of each other - it's OK for them to go right through each other in this game - so you set this to .none
+    monster.physicsBody?.collisionBitMask = PhysicsCategory.none
+    // --
     
     // Determine where to spawn the monster along the Y axis
     let actualY = random(min: monster.size.height/2, max: size.height - monster.size.height/2)
@@ -127,6 +126,14 @@ extension GameScene {
     // The sequence action allows you to chain together a sequence of actions that are performed in order, one at a time. This way, you can have the “move to” action performed first, and once it is complete, you perform the “remove from parent” action.
     monster.run(SKAction.sequence([actionMove, actionMoveDone]))
   }
+  
+  private func projectileDidCollideWithMonster(projectile: SKSpriteNode, monster: SKSpriteNode) {
+    print("A shuriken hit a monster!")
+    
+    // All you do here is remove the projectile and monster from the scene when they collide.
+    projectile.removeFromParent()
+    monster.removeFromParent()
+  }
 }
 
 // MARK: - Utilities
@@ -134,8 +141,7 @@ extension GameScene {
 extension GameScene {
   
   func random() -> CGFloat {
-    // TODO: But the preferred way would be using random(in:) method
-    // return CGFloat(Float.random(in: from...to))
+    // TODO: But the preferred way would be using random(in:) method: return CGFloat(Float.random(in: from...to))
     // or simply: return CGFloat.random(in: from...to)
     return CGFloat(Float(arc4random()) / Float(0xFFFFFFFF))
   }
@@ -143,4 +149,18 @@ extension GameScene {
   func random(min: CGFloat, max: CGFloat) -> CGFloat {
     return random() * (max - min) + min
   }
+}
+
+// MARK: - SKPhysicsContactDelegate
+
+extension GameScene: SKPhysicsContactDelegate {
+  
+  func didBegin(_ contact: SKPhysicsContact) {
+    var firstBody: SKPhysicsBody
+    var secondBody: SKPhysicsBody
+    if contact.bodyA.categoryBitMask < contact.bodyB.categoryBitMask {
+      
+    }
+  }
+  
 }
