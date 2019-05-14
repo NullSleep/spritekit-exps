@@ -35,7 +35,7 @@ class GameScene: SKScene {
   // Player sprite (i.e the ninja)
   private let player = SKSpriteNode(imageNamed: "player")
   
-  // MARK: - Scene core methods
+  // MARK: - SKScene methods
   
   override func didMove(to view: SKView) {
     backgroundColor = SKColor.white
@@ -53,7 +53,54 @@ class GameScene: SKScene {
     ))
   }
   
-  func addMonster() {
+  override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+    // Choose one of the touches to work with
+    guard let touch = touches.first else {
+      return
+    }
+    
+    // Using location(in:) to find out where the touch is within the scene's coordinate system.
+    let touchLocation = touch.location(in: self)
+    
+    // Set up initial location of projectile
+    let projectile = SKSpriteNode(imageNamed: "projectile")
+    projectile.position = player.position
+    
+    // Determine offset of location to projectile. Subtract the projectile's current position
+    // from the touch location to get a vector from the current position to the touch location.
+    let offset = touchLocation - projectile.position
+    
+    // Bail out if you are shooting down or backwards
+    if offset.x < 0 { return }
+    
+    // The position has been double checked, we should add the projectile now
+    addChild(projectile)
+    
+    // Get the direction of where to shoot. Convert the offset into a unit vector (of length 1) by
+    // calling normalized(). This will make it easy to make a vector with a fixed length in the
+    // same direction, because 1 * length = length.
+    let direction = offset.normalized()
+    
+    // Make it shoot far enough to be guaranteed off screen. Add the shoot amount to the current
+    // position to get where it should end up on the screen.
+    let shootAmount = direction * 1000
+    
+    // Add the shoot amount to the current position
+    let realDest = shootAmount + projectile.position
+    
+    // Create the actions
+    let actionMove = SKAction.move(to: realDest, duration: 2.0)
+    let actionMoveDone = SKAction.removeFromParent()
+    projectile.run(SKAction.sequence([actionMove, actionMoveDone]))
+  }
+  
+}
+
+// MARK: - Private methods
+
+extension GameScene {
+  
+  private func addMonster() {
     
     // Create the sprite
     let monster = SKSpriteNode(imageNamed: "monster")
@@ -80,7 +127,6 @@ class GameScene: SKScene {
     // The sequence action allows you to chain together a sequence of actions that are performed in order, one at a time. This way, you can have the “move to” action performed first, and once it is complete, you perform the “remove from parent” action.
     monster.run(SKAction.sequence([actionMove, actionMoveDone]))
   }
-  
 }
 
 // MARK: - Utilities

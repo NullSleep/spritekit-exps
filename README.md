@@ -24,7 +24,7 @@ The answer depends on what your goals are:
 - If you want to be cross-platform, or have a more complicated game: Use Unity — it’s more powerful and flexible.
 
 ## SpriteKit functionality:
-SpriteKit provides a lot of extremely useful built-in actions that help you easily change the state of sprites over time, such as move actions, rotate actions, fade actions, animation actions, and more. Here you use three actions on the monster:
-- SKAction.move(to:duration:): You use this action to make the object move off-screen to the left. You can specify how long the movement should take, and here you vary the duration randomly from 2-4 seconds.
-- SKAction.removeFromParent(): SpriteKit comes with a helpful action that removes a node from its parent, effectively deleting it from the scene. Here you use this action to remove the monster from the scene when it is no longer visible. This is important because otherwise you would have an endless supply of monsters and would eventually consume all device resources.
+SpriteKit provides a lot of extremely useful built-in actions that help you easily change the state of sprites over time, such as move actions, rotate actions, fade actions, animation actions, and more. Here are some of those actions:
+- SKAction.move(to:duration:): You use this action to make the object move off-screen to the left. You can specify how long the movement should take.
+- SKAction.removeFromParent(): SpriteKit comes with a helpful action that removes a node from its parent, effectively deleting it from the scene. This is important because otherwise you would have an endless supply of sprites and would eventually consume all device resources.
 - SKAction.sequence(_ :): The sequence action allows you to chain together a sequence of actions that are performed in order, one at a time. This way, you can have the “move to” action performed first, and once it is complete, you perform the “remove from parent” action.
