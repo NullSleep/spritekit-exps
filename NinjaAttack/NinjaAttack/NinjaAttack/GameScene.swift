@@ -10,6 +10,7 @@ class GameScene: SKScene {
   
   // Player sprite (i.e the ninja)
   private let player = SKSpriteNode(imageNamed: "player")
+  var monstersDestroyed = 0
   
   // MARK: - SKScene methods
   
@@ -128,11 +129,20 @@ extension GameScene {
     // You use this action to make the object move off-screen to the left. You can specify how long the movement should take, and here you vary the duration randomly from 2-4 seconds as specified by the constant actualDuration.
     let actionMove = SKAction.move(to: CGPoint(x: -monster.size.width/2, y: actualY),
                                    duration: TimeInterval(actualDuration))
+    
     // Here you use this action to remove the monster from the scene when it is no longer visible. This is important because otherwise you would have an endless supply of monsters and would eventually consume all device resources.
     let actionMoveDone = SKAction.removeFromParent()
     
-    // The sequence action allows you to chain together a sequence of actions that are performed in order, one at a time. This way, you can have the “move to” action performed first, and once it is complete, you perform the “remove from parent” action.
-    monster.run(SKAction.sequence([actionMove, actionMoveDone]))
+    // Prescent the game over scene action when a monster goes off-screen.
+    let loseAction = SKAction.run() { [weak self] in
+      guard let `self` = self else { return }
+      let reveal = SKTransition.flipHorizontal(withDuration: 0.5)
+      let gameOverScene = GameOverScene(size: self.size, won: false)
+      self.view?.presentScene(gameOverScene, transition: reveal)
+    }
+    
+    // The sequence action allows you to chain together a sequence of actions that are performed in order, one at a time. This way, you can have the “move to” action performed first, and once it is complete, you perform the “remove from parent” action and then show the Game Over scene
+    monster.run(SKAction.sequence([actionMove, loseAction, actionMoveDone]))
   }
   
   private func projectileDidCollideWithMonster(projectile: SKSpriteNode, monster: SKSpriteNode) {
@@ -141,6 +151,14 @@ extension GameScene {
     // All you do here is remove the projectile and monster from the scene when they collide.
     projectile.removeFromParent()
     monster.removeFromParent()
+    
+    monstersDestroyed += 1
+    
+    if monstersDestroyed > 30 {
+      let reveal = SKTransition.flipHorizontal(withDuration: 0.5)
+      let gameOverScene = GameOverScene(size: self.size, won: true)
+      view?.presentScene(gameOverScene, transition: reveal)
+    }
   }
 }
 
