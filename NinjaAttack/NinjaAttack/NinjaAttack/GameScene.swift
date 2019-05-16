@@ -30,6 +30,11 @@ class GameScene: SKScene {
         SKAction.wait(forDuration: 1.0)
         ])
     ))
+    
+    // This uses SKAudioNode to play and loop the background music for the game
+    let backgroundMusic = SKAudioNode(fileNamed: "background-music-acc.caf")
+    backgroundMusic.autoplayLooped = true
+    addChild(backgroundMusic)
   }
   
   override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -37,6 +42,9 @@ class GameScene: SKScene {
     guard let touch = touches.first else {
       return
     }
+    
+    // Playing the shootting sound
+    run(SKAction.playSoundFileNamed("pew-pew-lei.caf", waitForCompletion: false))
     
     // Using location(in:) to find out where the touch is within the scene's coordinate system.
     let touchLocation = touch.location(in: self)
@@ -155,11 +163,24 @@ extension GameScene {
 
 extension GameScene: SKPhysicsContactDelegate {
   
+  // Since you set the scene as the physics world's contactDelegate earlier, this method will be called whenever two physics bodies collide and their contactTestBitMask are set appropiately. This mehtods passes you two bodies that collide, but does no guarantee that they are passed in any particular order.
   func didBegin(_ contact: SKPhysicsContact) {
+    //  This arranges them so they are sorted by their category bit masks so you can make some decissions later.
     var firstBody: SKPhysicsBody
     var secondBody: SKPhysicsBody
     if contact.bodyA.categoryBitMask < contact.bodyB.categoryBitMask {
-      
+      firstBody = contact.bodyA
+      secondBody = contact.bodyB
+    } else {
+      firstBody = contact.bodyB
+      secondBody = contact.bodyA
+    }
+    
+    // Here we check if the two bodies that collided are the projectile and monster and if so the projectileDidCollideWithMonster mehtod is called.
+    if ((firstBody.categoryBitMask & PhysicsCategory.monster != 0) && (secondBody.categoryBitMask & PhysicsCategory.projectile != 0)) {
+      if let monster = firstBody.node as? SKSpriteNode, let projectile = secondBody.node as? SKSpriteNode {
+        projectileDidCollideWithMonster(projectile: projectile, monster: monster)
+      }
     }
   }
   
