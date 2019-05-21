@@ -45,7 +45,7 @@ class GameScene: SKScene {
         // This physics body is set to every node and we attach it to the scene.
         self.physicsBody = borderBody
         
-        // Remooving gravity from the scene.
+        // Removing gravity from the scene.
         physicsWorld.gravity = CGVector(dx: 0.0, dy: 0.0)
         // Getting the instnace of the ball
         let ball = childNode(withName: BallCategoryName) as! SKSpriteNode

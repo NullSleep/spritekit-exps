@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		236E1AA02294544A00AD2E24 /* Bitmasks.png in Resources */ = {isa = PBXBuildFile; fileRef = 236E1A9F2294544A00AD2E24 /* Bitmasks.png */; };
+		236E1AA22294549200AD2E24 /* Spritekit Contact.md in Resources */ = {isa = PBXBuildFile; fileRef = 236E1AA12294549200AD2E24 /* Spritekit Contact.md */; };
 		F577B38F1CB81F840005E827 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F577B38E1CB81F840005E827 /* AppDelegate.swift */; };
 		F577B3911CB81F840005E827 /* GameScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = F577B3901CB81F840005E827 /* GameScene.sks */; };
 		F577B3931CB81F840005E827 /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = F577B3921CB81F840005E827 /* GameScene.swift */; };
@@ -27,6 +29,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		236E1A9F2294544A00AD2E24 /* Bitmasks.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Bitmasks.png; sourceTree = "<group>"; };
+		236E1AA12294549200AD2E24 /* Spritekit Contact.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = "Spritekit Contact.md"; sourceTree = "<group>"; };
 		F577B38B1CB81F840005E827 /* Bamboo Breakout.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Bamboo Breakout.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F577B38E1CB81F840005E827 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		F577B3901CB81F840005E827 /* GameScene.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = GameScene.sks; sourceTree = "<group>"; };
@@ -59,6 +63,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		236E1A9C229452FB00AD2E24 /* Spritekit Info */ = {
+			isa = PBXGroup;
+			children = (
+				236E1AA12294549200AD2E24 /* Spritekit Contact.md */,
+				236E1A9F2294544A00AD2E24 /* Bitmasks.png */,
+			);
+			path = "Spritekit Info";
+			sourceTree = "<group>";
+		};
 		F577B3821CB81F840005E827 = {
 			isa = PBXGroup;
 			children = (
@@ -78,6 +91,7 @@
 		F577B38D1CB81F840005E827 /* Bamboo Breakout */ = {
 			isa = PBXGroup;
 			children = (
+				236E1A9C229452FB00AD2E24 /* Spritekit Info */,
 				F577B38E1CB81F840005E827 /* AppDelegate.swift */,
 				F577B3941CB81F840005E827 /* GameViewController.swift */,
 				F577B3901CB81F840005E827 /* GameScene.sks */,
@@ -184,10 +198,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				F577B3911CB81F840005E827 /* GameScene.sks in Resources */,
+				236E1AA22294549200AD2E24 /* Spritekit Contact.md in Resources */,
 				F5B9A21F1CC1392A000D5BC7 /* BallTrail.sks in Resources */,
 				F577B3BA1CB8210A0005E827 /* pongblip.wav in Resources */,
 				F577B3B81CB8210A0005E827 /* game-won.mp3 in Resources */,
 				F597B1221CC1B1F000D398E0 /* BambooBreak.wav in Resources */,
+				236E1AA02294544A00AD2E24 /* Bitmasks.png in Resources */,
 				F577B39D1CB81F840005E827 /* LaunchScreen.storyboard in Resources */,
 				F577B3B71CB8210A0005E827 /* game-over.wav in Resources */,
 				F577B39A1CB81F840005E827 /* Assets.xcassets in Resources */,
