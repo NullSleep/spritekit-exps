@@ -16,9 +16,7 @@ SpriteKit is one of the best ways to make games on iOS. It’s easy to learn, po
 - Asset store. Other engines come with a built-in asset stores where you can buy various components for your game. Some of these components can save you a good bit of development time!
 - Power. In general, other engines like Unity just has more features and functionality than the SpriteKit/Scene Kit combination.
 
-## Which Should I Choose?
-After this you may be thinking, “Well, which 2D framework should I choose?”
-
+## Should I choose SpriteKit?
 The answer depends on what your goals are:
 - If you’re a complete beginner, or solely focused on the Apple ecosystem: Use SpriteKit — it’s built-in, easy to learn, and will get the job done.
 - If you want to be cross-platform, or have a more complicated game: Use Unity — it’s more powerful and flexible.
