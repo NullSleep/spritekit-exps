@@ -31,8 +31,16 @@ let GameMessageName = "gameMessage"
 // Note: Usually, it’s best to have the physics body be fairly similar to what the player sees. For the ball it’s very easy to have a perfect match. However, with more complex shapes you’ll need to be careful since very complex bodies can exact a high toll on performance. Since iOS 8 and Xcode 6, Sprite Kit supports alpha masks body types, that automatically take the shape of a sprite as the shape of its physics body, but be careful as it can degrade performance.
 
 class GameScene: SKScene {
+    
     // MARK: - Class properties
     var isFingerOnPaddle = false
+    
+    // Setting the last bit to 1 and the other bits to zero. We use the << operator to shift a bit to the left. As a result each category constant has only one bit set to 1 and the position of the 1 in the binary number is unique across the four categories.
+    let BallCategory   : UInt32 = 0x1 << 0
+    let BottomCategory : UInt32 = 0x1 << 1
+    let BlockCategory  : UInt32 = 0x1 << 2
+    let PaddleCategory : UInt32 = 0x1 << 3
+    let BorderCategory : UInt32 = 0x1 << 4
     
     // MARK: - GameScene methods
     override func didMove(to view: SKView) {
@@ -47,10 +55,26 @@ class GameScene: SKScene {
         
         // Removing gravity from the scene.
         physicsWorld.gravity = CGVector(dx: 0.0, dy: 0.0)
+        // Setting the GameScene as a SKPhysicsContactDelegate
+        physicsWorld.contactDelegate = self
         // Getting the instnace of the ball
         let ball = childNode(withName: BallCategoryName) as! SKSpriteNode
         // Applying an impulse (and immediate force to a physiscs body to get it moving in a particuar direction) diagonally down to the right.
         ball.physicsBody!.applyImpulse(CGVector(dx: 2.0, dy: -2.0))
+        
+        // To determine when the user has lost we create a physics body that stretches across the bottom of the screen.
+        let bottomRect = CGRect(x: frame.origin.x, y: frame.origin.y, width: frame.size.width, height: 1)
+        let bottom = SKNode()
+        bottom.physicsBody = SKPhysicsBody(edgeLoopFrom: bottomRect)
+        addChild(bottom)
+        
+        // Setting categories for all the nodes
+        let paddle = childNode(withName: PaddleCategoryName) as! SKSpriteNode
+        bottom.physicsBody!.categoryBitMask = BottomCategory
+        ball.physicsBody!.categoryBitMask = BallCategory
+        paddle.physicsBody!.categoryBitMask = PaddleCategory
+        borderBody.categoryBitMask = BorderCategory
+        ball.physicsBody!.contactTestBitMask = BottomCategory
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -96,4 +120,27 @@ class GameScene: SKScene {
         isFingerOnPaddle = false
     }
 
+}
+
+extension GameScene: SKPhysicsContactDelegate {
+    
+    func didBegin(_ contact: SKPhysicsContact) {
+        // Create the two local variables to hold the two physics bodies involved in the collision
+        var firstBody: SKPhysicsBody
+        var secondBody: SKPhysicsBody
+        
+        // Check the two bodies  that collided to see which has the lower categoryBitmask. Then store them into the local variables, so that the body with the lower category is always stored in the first body. This will sabe quite some effort reacting to contacts between specific categories.
+        if contact.bodyA.categoryBitMask < contact.bodyB.categoryBitMask {
+            firstBody = contact.bodyA
+            secondBody = contact.bodyB
+        } else {
+            firstBody = contact.bodyB
+            secondBody = contact.bodyA
+        }
+        
+        // Beacuse of the sorting made above we only need to check whether firstBody is in the BallCategory and whether secondBody is in the BottomCategory to figure out that the ball has touched the bottom of the screen. This is since we already know that SecondBody could not possibly be in the BallCategory if firstBody is in the BottomCategory (becuse BottomCategory has a higher bit mask than BallCategory)
+        if firstBody.categoryBitMask == BallCategory && secondBody.categoryBitMask == BottomCategory {
+            print("Hit bottom. First contact has been made.")
+        }
+    }
 }
