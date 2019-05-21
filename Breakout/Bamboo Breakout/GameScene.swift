@@ -74,7 +74,29 @@ class GameScene: SKScene {
         ball.physicsBody!.categoryBitMask = BallCategory
         paddle.physicsBody!.categoryBitMask = PaddleCategory
         borderBody.categoryBitMask = BorderCategory
-        ball.physicsBody!.contactTestBitMask = BottomCategory
+        // The above executes a bitwise OR operation on BottomCategory and BlockCategory. The result is that the bits for those two particular categories are set to one while all other bits are still zero. Now, collisions between ball and floor as well as ball and blocks will be sent to to the delegate.
+        ball.physicsBody!.contactTestBitMask = BottomCategory | BlockCategory
+        
+        // Adding the blocks to be broken
+        let numberOfBlocks = 8
+        let blockWidth = SKSpriteNode(imageNamed: "block").size.width
+        let totalBlocksWidth = blockWidth * CGFloat(numberOfBlocks)
+        // calculating the x offset, the distance between the left border of the screen and the first block. You calculate it by substracting the width of all the blocks from the screen width and then dividing it by 2
+        let xOffset = (frame.width - totalBlocksWidth) / 2
+        // Create the blocks, configure each with the proper physics properties, and position each one using blockWith, and xOffset.
+        for i in 0..<numberOfBlocks {
+            let block = SKSpriteNode(imageNamed: "block.png")
+            block.position = CGPoint(x: xOffset + CGFloat(CGFloat(i) + 0.5) * blockWidth,  y: frame.height * 0.8)
+            block.physicsBody = SKPhysicsBody(rectangleOf: block.frame.size)
+            block.physicsBody!.allowsRotation = false
+            block.physicsBody!.friction = 0.0
+            block.physicsBody!.affectedByGravity = false
+            block.physicsBody!.isDynamic = false
+            block.name = BlockCategoryName
+            block.physicsBody!.categoryBitMask = BlockCategory
+            block.zPosition = 2
+            addChild(block)
+        }
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -121,6 +143,29 @@ class GameScene: SKScene {
     }
 
 }
+
+// MARK: - Utilities
+
+extension GameScene {
+    
+    func breakBlock(node: SKNode) {
+        // Emitter nodes are a special type of nodes that display particle systems created in the Scene Editor.
+        // Creating and instance of the SKEmitterNode from the BrokenPlatform.sks file.
+        let particles = SKEmitterNode(fileNamed: "BrokenPlatform")!
+        // Sets it's position to the same position as the node
+        particles.position = node.position
+        // The emitter node's zPosition is set to 3, so the particles appear above the remaining blocks.
+        particles.zPosition = 3
+        // Add the particles then remove them after 1 second.
+        addChild(particles)
+        let actionSequence = SKAction.sequence([SKAction.wait(forDuration: 1.0),
+                                                SKAction.removeFromParent()])
+        particles.run(actionSequence)
+    }
+    
+}
+
+// MARK: - SKPhysicsContactDelegate
 
 extension GameScene: SKPhysicsContactDelegate {
     

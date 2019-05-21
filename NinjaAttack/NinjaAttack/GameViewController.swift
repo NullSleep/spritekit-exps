@@ -2,8 +2,6 @@
 //  Copyright © 2018 Polygon. All rights reserved.
 //
 
-// Reference: https://www.raywenderlich.com/71-spritekit-tutorial-for-beginners
-
 import UIKit
 import SpriteKit
 
